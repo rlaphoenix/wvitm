@@ -9,6 +9,9 @@ description = "Widevine Man-in-the-Middle Intercepter for Clearkey Livestreams"
 authors = ["rlaphoenix <rlaphoenix@pm.me>"]
 license = "MIT"
 
+[tool.poetry.scripts]
+wvitm = 'wvitm.wvitm:main'
+
 [tool.poetry.dependencies]
 python = ">=3.7,<3.11"
 aiohttp = "^3.8.1"
