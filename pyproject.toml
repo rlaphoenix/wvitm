@@ -11,3 +11,4 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.11"
+aiohttp = "^3.8.1"
