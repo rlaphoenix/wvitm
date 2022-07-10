@@ -29,10 +29,11 @@ async def cleanup(app: web.Application):
 )
 @click.option("-h", "--host", type=str, default="::", help="Port to run Web Server On")
 @click.option("-p", "--port", type=int, default=8080, help="Port to run Web Server On")
-def main(host: str, port: int):
+@click.option("-d", "--debug", is_flag=True, default=False, help="Enable DEBUG level logs.")
+def main(host: str, port: int, debug: bool):
     app = web.Application()
     app.add_routes(services)
     app.on_startup.append(startup)
     app.on_cleanup.append(cleanup)
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=[logging.INFO, logging.DEBUG][debug])
     web.run_app(app, host=host, port=port)
