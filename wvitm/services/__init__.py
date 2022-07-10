@@ -6,3 +6,4 @@ services = web.RouteTableDef()
 
 from wvitm.services.filmon import filmon
 from wvitm.services.ping import ping
+from wvitm.services.youtube import youtube
