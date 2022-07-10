@@ -4,6 +4,7 @@ import aiohttp
 from aiohttp import web
 import click
 
+from wvitm.intercept import shaka
 from wvitm.services import services
 
 
@@ -33,6 +34,7 @@ async def cleanup(app: web.Application):
 def main(host: str, port: int, debug: bool):
     app = web.Application()
     app.add_routes(services)
+    app.add_routes([web.get("/shaka/{service}/{channel}/{seg_type}/{path}", shaka)])
     app.on_startup.append(startup)
     app.on_cleanup.append(cleanup)
     logging.basicConfig(level=[logging.INFO, logging.DEBUG][debug])
