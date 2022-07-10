@@ -123,7 +123,7 @@ async def shaka(request: web.Request) -> web.Response:
             except CalledProcessError as e:
                 return web.json_response({
                     "status": 400,
-                    "message": f"Shaka reported a decryption error: {e.output}"
+                    "message": f"Shaka reported a decryption error: {e.stderr.decode()}"
                 })
 
             out = DRM_SEGMENT_CACHE[service_key][path] = remove_init_data(segment_file_path.read_bytes())
