@@ -2,10 +2,9 @@ import logging
 
 import aiohttp
 from aiohttp import web
+import click
 
 from wvitm.services import services
-
-PORT = 8118
 
 
 async def startup(app: web.Application):
@@ -22,10 +21,18 @@ async def cleanup(app: web.Application):
         await app["session"].close()
 
 
-def main():
+@click.command(
+    context_settings=dict(
+        help_option_names=["-?", "-h", "--help"],  # default only has --help
+        max_content_width=116,  # max PEP8 line-width, -4 to adjust for initial indent
+    )
+)
+@click.option("-h", "--host", type=str, default="::", help="Port to run Web Server On")
+@click.option("-p", "--port", type=int, default=8080, help="Port to run Web Server On")
+def main(host: str, port: int):
     app = web.Application()
     app.add_routes(services)
     app.on_startup.append(startup)
     app.on_cleanup.append(cleanup)
     logging.basicConfig(level=logging.INFO)
-    web.run_app(app, port=PORT)
+    web.run_app(app, host=host, port=port)
