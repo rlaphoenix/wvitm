@@ -5,6 +5,7 @@ from aiohttp import web
 import click
 
 from wvitm.intercept import shaka
+from wvitm.proxy import proxy
 from wvitm.services import services
 
 
@@ -35,6 +36,7 @@ def main(host: str, port: int, debug: bool):
     app = web.Application()
     app.add_routes(services)
     app.add_routes([web.get("/shaka/{service}/{channel}/{seg_type}/{path}", shaka)])
+    app.add_routes([web.get("/proxy/{server}", proxy)])
     app.on_startup.append(startup)
     app.on_cleanup.append(cleanup)
     logging.basicConfig(level=[logging.INFO, logging.DEBUG][debug])
