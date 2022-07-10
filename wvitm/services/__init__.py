@@ -4,6 +4,7 @@ services = web.RouteTableDef()
 
 # must import services after services route table above
 
+from wvitm.services.channel4 import channel4
 from wvitm.services.filmon import filmon
 from wvitm.services.ping import ping
 from wvitm.services.rte import rte
