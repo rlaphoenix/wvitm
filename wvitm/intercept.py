@@ -8,6 +8,7 @@ from subprocess import CalledProcessError
 import aiohttp
 from aiohttp import web
 
+from wvitm.proxy import _proxy
 
 DRM_INIT_CACHE = {}
 DRM_SEGMENT_CACHE = defaultdict(dict)
@@ -68,6 +69,7 @@ async def shaka(request: web.Request) -> web.Response:
     channel = request.match_info["channel"]
     seg_type = request.match_info["seg_type"]
     path = request.match_info["path"]
+    proxy = request.rel_url.query.get("proxy")
 
     url = recover_url(service, channel, path)
     presentation_id = recover_presentation_id(service, channel, path)
@@ -76,8 +78,12 @@ async def shaka(request: web.Request) -> web.Response:
     key_prefix = f"{service_key}-{presentation_id}"
 
     if seg_type == "init":
-        async with session.get(url) as r:
-            out = DRM_INIT_CACHE[key_prefix] = await r.read()
+        if proxy:
+            init = await _proxy(session, proxy, url)
+        else:
+            async with session.get(url) as r:
+                init = await r.read()
+        out = DRM_INIT_CACHE[key_prefix] = init
     else:
         out = DRM_SEGMENT_CACHE[service_key].get(path)
         if not out:
@@ -98,8 +104,12 @@ async def shaka(request: web.Request) -> web.Response:
 
             segment_file_path = Path(tempfile.gettempdir(), "wvitm", f"{key_prefix}-{path}.mp4")
             segment_file_path.parent.mkdir(parents=True, exist_ok=True)
-            async with session.get(url) as r:
-                segment_file_path.write_bytes(init + await r.read())
+            if proxy:
+                segment = await _proxy(session, proxy, url)
+            else:
+                async with session.get(url) as r:
+                    segment = await r.read()
+            segment_file_path.write_bytes(init + segment)
 
             try:
                 args = [
